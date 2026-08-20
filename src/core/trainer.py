@@ -117,12 +117,25 @@ class YoloTrainerWorker(QThread):
                 epoch = trainer.epoch + 1
                 # 提取训练与验证指标
                 metrics = {}
-                if hasattr(trainer, "loss_items") and trainer.loss_items is not None:
-                    loss_items = trainer.loss_items.cpu().numpy() if hasattr(trainer.loss_items, "cpu") else trainer.loss_items
-                    if len(loss_items) >= 3:
-                        metrics["box_loss"] = float(loss_items[0])
-                        metrics["cls_loss"] = float(loss_items[1])
-                        metrics["dfl_loss"] = float(loss_items[2])
+                try:
+                    if hasattr(trainer, "loss_items") and trainer.loss_items is not None:
+                        li = trainer.loss_items
+                        if isinstance(li, dict):
+                            metrics["box_loss"] = float(li.get("box_loss", 0.0))
+                            metrics["cls_loss"] = float(li.get("cls_loss", 0.0))
+                            metrics["dfl_loss"] = float(li.get("dfl_loss", 0.0))
+                        elif hasattr(li, "cpu"):
+                            arr = li.cpu().numpy()
+                            if len(arr) >= 3:
+                                metrics["box_loss"] = float(arr[0])
+                                metrics["cls_loss"] = float(arr[1])
+                                metrics["dfl_loss"] = float(arr[2])
+                        elif isinstance(li, (list, tuple)) and len(li) >= 3:
+                            metrics["box_loss"] = float(li[0])
+                            metrics["cls_loss"] = float(li[1])
+                            metrics["dfl_loss"] = float(li[2])
+                except Exception:
+                    pass
 
                 # 提取验证集评估结果
                 if hasattr(trainer, "metrics") and trainer.metrics:
@@ -151,8 +164,19 @@ class YoloTrainerWorker(QThread):
                 batch = getattr(trainer, "batch", 0) + 1
                 total_batches = getattr(trainer, "num_batches", 1)
                 loss = 0.0
-                if hasattr(trainer, "loss_items") and trainer.loss_items is not None:
-                    loss = float(trainer.loss_items[0]) if len(trainer.loss_items) > 0 else 0.0
+                try:
+                    if hasattr(trainer, "loss_items") and trainer.loss_items is not None:
+                        li = trainer.loss_items
+                        if isinstance(li, dict):
+                            loss = float(li.get("box_loss", 0.0))
+                        elif isinstance(li, (list, tuple)) and len(li) > 0:
+                            loss = float(li[0])
+                        elif hasattr(li, "item"):
+                            loss = float(li.item())
+                    elif hasattr(trainer, "loss") and trainer.loss is not None:
+                        loss = float(trainer.loss.item()) if hasattr(trainer.loss, "item") else float(trainer.loss)
+                except Exception:
+                    loss = 0.0
 
                 self.batch_progress.emit(
                     batch,
@@ -187,11 +211,14 @@ class YoloTrainerWorker(QThread):
             if not os.path.exists(best_weights):
                 if hasattr(results, "save_dir"):
                     best_weights = os.path.join(str(results.save_dir), "weights", "best.pt")
+                    if not os.path.exists(best_weights):
+                        best_weights = os.path.join(str(results.save_dir), "weights", "last.pt")
 
             self.log_message.emit(f"🎉 训练顺利完成！最优权重已保存至: {best_weights}")
             self.training_done.emit(best_weights)
 
         except Exception as e:
-            err_msg = str(e)
+            import traceback
+            err_msg = f"{type(e).__name__}: {str(e)}"
             self.log_message.emit(f"❌ 训练发生异常: {err_msg}")
             self.training_failed.emit(err_msg)
