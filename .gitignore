@@ -71,6 +71,7 @@ weights/
 # Datasets and image caches
 data/
 datasets/
+*.cache
 *.jpg
 *.jpeg
 *.png
@@ -82,6 +83,7 @@ datasets/
 # Allow sample demo images
 !samples/**
 !samples/**/*
+
 
 
 # IDEs
