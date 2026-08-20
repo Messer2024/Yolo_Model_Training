@@ -54,10 +54,18 @@ graph LR
   - **显存与硬件适配**：检测 GPU VRAM 大小。若 VRAM $\le 4\text{GB}$，自动推荐 `yolov8n` / `yolo11n`，设置 `batch=8`, `imgsz=640`，开启 `amp=True`（半精度）；若 VRAM $\ge 16\text{GB}$，推荐 `yolov8x` 或更大模型并启用更高 batch 大小。
   - **收敛策略**：根据小目标与密集目标占比，动态调整 `box` 损失权重与 `mosaic` 增强概率。
 
-### 2.3 模型诊断与报告智能体 (`ModelDiagnoseAgent`)
+### 2.3 应用自动化巡检与质量测试智能体 (`AppTestAndAuditAgent`)
+- **职责**：执行全生命周期工作流压力测试与 GUI 事件流模拟，全面审计标注、数据集、训练、推理与导出五大模块的健康度。
+- **输出**：结构化 `BugReport`，包含缺陷等级（CRITICAL/HIGH/MEDIUM/LOW）、复现步骤与错误堆栈。
+
+### 2.4 自动化缺陷修复与代码自愈智能体 (`BugFixAgent`)
+- **职责**：解析 `BugReport` 或实时捕获的异常信息，自动识别缺陷模式（如 KeyError 字典索引异常、视频无限放大递归环、显存 OOM 等），制定自愈补丁并触发回归验证。
+
+### 2.5 模型诊断与报告智能体 (`ModelDiagnoseAgent`)
 - **职责**：在训练完成后解析 `runs/detect/train/` 下的指标曲线与混淆矩阵，生成通俗易懂的质量诊断与改进建议报告。
 - **输出示例**：
   - “类别 `helmet` 的召回率（Recall 96%）优异，但类别 `vest` 的精确率（Precision 62%）较低，存在较多误检，建议增加反光背心在反光强光场景下的负样本图片。”
+
 
 ---
 

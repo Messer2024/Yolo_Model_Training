@@ -149,11 +149,11 @@ class MainWindow(QMainWindow):
             self.train_view.auto_detect_yaml()
         elif index == 3:
             # 切换到推理测试页面
-            if self.train_view.best_model_path:
-                self.inference_view.load_model(self.train_view.best_model_path)
+            if self.train_view.best_model_path and os.path.exists(self.train_view.best_model_path):
+                self.inference_view.set_newly_trained_model(self.train_view.best_model_path)
         elif index == 4:
             # 切换到模型导出页面
-            if self.train_view.best_model_path:
+            if self.train_view.best_model_path and os.path.exists(self.train_view.best_model_path):
                 self.export_view.set_weights_path(self.train_view.best_model_path)
 
     def _show_user_manual(self):
