@@ -80,13 +80,16 @@ class GuiWorkflowTestSkill(BaseSkill):
             if not os.path.exists(sample_dir):
                 raise FileNotFoundError(f"示例数据集目录不存在: {sample_dir}")
 
+            import tempfile
+            temp_out = os.path.join(tempfile.gettempdir(), "test_gui_dataset_split")
+
             dm = DatasetManager(sample_dir)
             audit = dm.audit_dataset()
             assert "health_score" in audit, "体检报告缺少 health_score"
             assert audit["total_images"] > 0, "未扫描到有效图像"
 
-            # 测试自动划分
-            split_res = dm.split_dataset(train_ratio=0.7, val_ratio=0.3, test_ratio=0.0)
+            # 测试自动划分到独立测试目录
+            split_res = dm.split_dataset(train_ratio=0.7, val_ratio=0.3, test_ratio=0.0, output_dir=temp_out)
             assert split_res["success"], f"数据集划分失败: {split_res.get('message')}"
             assert os.path.exists(split_res["yaml_path"]), "data.yaml 未生成"
 

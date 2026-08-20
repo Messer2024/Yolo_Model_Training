@@ -241,18 +241,29 @@ class DatasetManager:
             for src_img in img_list:
                 img_name = os.path.basename(src_img)
                 dst_img = os.path.join(target_dir, "images", split_name, img_name)
-                shutil.copy2(src_img, dst_img)
+                if os.path.abspath(src_img) != os.path.abspath(dst_img):
+                    try:
+                        shutil.copy2(src_img, dst_img)
+                    except Exception as e:
+                        logger.warning(f"复制图像失败: {e}")
 
                 src_txt = self._get_label_path(src_img)
                 dst_txt = os.path.join(target_dir, "labels", split_name, os.path.splitext(img_name)[0] + ".txt")
 
                 if os.path.exists(src_txt):
-                    shutil.copy2(src_txt, dst_txt)
+                    if os.path.abspath(src_txt) != os.path.abspath(dst_txt):
+                        try:
+                            shutil.copy2(src_txt, dst_txt)
+                        except Exception as e:
+                            logger.warning(f"复制标注失败: {e}")
                 else:
                     boxes = self.labels_map.get(src_img, [])
-                    with open(dst_txt, "w", encoding="utf-8") as f:
-                        for b in boxes:
-                            f.write(b.to_yolo_str() + "\n")
+                    try:
+                        with open(dst_txt, "w", encoding="utf-8") as f:
+                            for b in boxes:
+                                f.write(b.to_yolo_str() + "\n")
+                    except Exception as e:
+                        logger.warning(f"写入标注失败: {e}")
 
         yaml_path = os.path.join(target_dir, "data.yaml")
         yaml_content = {

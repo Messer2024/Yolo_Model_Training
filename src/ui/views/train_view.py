@@ -96,10 +96,10 @@ class TrainView(QWidget):
             self.combo_device.addItem("CPU 处理器", "cpu")
         config_layout.addWidget(self.combo_device, 2, 3)
 
-        # 智能推荐与操作按钮
+        # 参数推荐与操作按钮
         btn_bar = QHBoxLayout()
-        self.btn_recommend = QPushButton("🤖 智能体自适应推荐参数 (AutoML)")
-        self.btn_recommend.setStyleSheet("background-color: #3f37c9; color: white;")
+        self.btn_recommend = QPushButton("⚙️ 自动推荐训练参数 (AutoML)")
+        self.btn_recommend.setStyleSheet("background-color: #3a0ca3; color: white;")
         self.btn_recommend.clicked.connect(self._on_auto_recommend)
         btn_bar.addWidget(self.btn_recommend)
 
@@ -183,8 +183,8 @@ class TrainView(QWidget):
 
         QMessageBox.information(
             self,
-            "智能体推荐策略",
-            f"🤖 决策建议：\n{res['reason']}\n\n"
+            "参数推荐建议",
+            f"💡 推荐策略分析：\n{res['reason']}\n\n"
             f"• 推荐模型: {res['recommended_model']}\n"
             f"• 推荐 Epochs: {res['recommended_epochs']}\n"
             f"• 推荐 Batch: {res['recommended_batch']}\n"

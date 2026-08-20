@@ -83,6 +83,9 @@ datasets/
 # Allow sample demo images
 !samples/**
 !samples/**/*
+dataset_split/
+**/dataset_split/
+*.cache
 
 
 

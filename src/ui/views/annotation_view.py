@@ -73,9 +73,9 @@ class AnnotationView(QWidget):
 
         toolbar.addStretch()
 
-        # AI 智能预打标按钮
-        self.btn_autolabel = QPushButton("🤖 AI 辅助预标注")
-        self.btn_autolabel.setStyleSheet("background-color: #7b2cbf; color: white; font-weight: bold;")
+        # 自动预打标按钮
+        self.btn_autolabel = QPushButton("🎯 批量自动预标注")
+        self.btn_autolabel.setStyleSheet("background-color: #5a189a; color: white; font-weight: bold;")
         self.btn_autolabel.clicked.connect(self._on_auto_label)
         toolbar.addWidget(self.btn_autolabel)
 
@@ -228,8 +228,8 @@ class AnnotationView(QWidget):
 
         reply = QMessageBox.question(
             self,
-            "AI 辅助预标注",
-            f"将使用预训练 YOLOv8n 模型对当前项目的 {len(self.dm.image_files)} 张图片进行自动预打标。\n是否继续？",
+            "批量自动预标注",
+            f"将使用预训练模型对当前项目的 {len(self.dm.image_files)} 张图片进行自动初筛打标。\n是否继续？",
             QMessageBox.Yes | QMessageBox.No
         )
         if reply == QMessageBox.Yes:
@@ -239,6 +239,6 @@ class AnnotationView(QWidget):
                     if boxes:
                         self.dm.save_annotation(img_path, boxes)
                 self.reload_data()
-                QMessageBox.information(self, "完成", "AI 预标注完成！已为所有图片生成候选目标框，请核对微调。")
+                QMessageBox.information(self, "完成", "自动预标注完成！已为所有图片生成候选目标框，请核对微调。")
             except Exception as e:
-                QMessageBox.critical(self, "错误", f"AI 预标注失败: {e}")
+                QMessageBox.critical(self, "错误", f"自动预标注失败: {e}")
