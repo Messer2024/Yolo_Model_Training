@@ -1,0 +1,9 @@
+person
+bus
+car
+dog
+bicycle
+horse
+eagle
+kite
+giraffe

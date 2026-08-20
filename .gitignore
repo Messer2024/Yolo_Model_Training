@@ -79,6 +79,11 @@ datasets/
 *.avi
 *.mov
 
+# Allow sample demo images
+!samples/**
+!samples/**/*
+
+
 # IDEs
 .idea/
 .vscode/
